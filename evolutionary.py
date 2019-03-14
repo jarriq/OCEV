@@ -25,24 +25,26 @@ class EvolutionaryAlgorithm():
         if COD not in ["bin","int","int-perm","real"]:
             raise ValueError("Codificação inválida ou não suportada")
 
-
-        for i in range(0,POP):
-            self.list_pop.append(Individual('bin',D=D,bounds=bounds))
+        print (bounds)
+        for _ in range(0,POP):
+            #new_individual = Individual('bin',D=D,bounds=bounds)
+            self.list_pop.append(Individual(COD=COD,D=D,bounds=bounds))
 
     def print_pop(self):
         for i in range(0,len(self.list_pop)):
-            print (self.list_pop[i].chromossome)
+            print ("Individual ", i+1, ":",self.list_pop[i].chromossome)
         return
 
 
 
 class Individual():
 
-    chromossome = []
+    
 
     def __init__(self,COD,D,bounds,seed=None):
+        self.chromossome = []
         if seed != None:
-            random.random.seed(seed)
+            random.seed(seed)
         self.gera_cromossomo(COD,D,bounds)
         pass
 
@@ -57,43 +59,40 @@ class Individual():
                     self.chromossome.append(gene)
             elif COD == 'int':
                 for i in range(0,D):
-                    gene = random.randint(bounds[0],bounds[1])
+                    gene = random.randrange(bounds[0],bounds[1])
                     self.chromossome.append(gene)
             elif COD == 'int-perm':
                 for i in range(0,D):
-                    gene = random.randint(bounds[0],bounds[1])
+                    gene = random.randrange(bounds[0],bounds[1])
                     self.chromossome.append(gene)
             elif COD == 'real':
                 for i in range(0,D):
-                    gene = random.uniform(bounds[0],bounds[1])
+                    gene = random.random(bounds[0],bounds[1])
                     self.chromossome.append(gene)
         else:
             raise Exception("Combinação de parâmetros inválida")
+
         return
 
     def params_are_valid(self,COD, D, bounds):
-        return (True)
-        """
         if COD in ['int','int-perm','real']:
-            if (bounds is None) or (bounds[0] => bounds[1]) or (not isinstance(tuple,bounds)) or (len(bounds)>2):
+            if (bounds is None) or (bounds[0] >= bounds[1]) or (not isinstance(bounds,tuple)) or (len(bounds)>2):
                 return (False)
         elif COD == 'bin':
             if bounds is not None:
+                print ("AAAAAAAAAA")
                 return (False)
-        """
-
-
-
-
+        
+        return (True)
 
     def print_individual(self):
-        print (chromossome)
+        print (self.chromossome)
         return
 
 if __name__ == "__main__":
     start = time.time()
     ae = EvolutionaryAlgorithm()
-    ae.gera_pop('bin',D=10,POP=500)
+    ae.gera_pop('int',D=30,POP=5000,bounds=(-50,50))
     ae.print_pop()
     end = time.time() - start 
     print ("Tima taken: ",end," seconds")
