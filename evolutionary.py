@@ -1,6 +1,10 @@
 
 import time
 import random
+import multiprocessing
+from numba import double
+from numba.decorators import jit, autojit
+import numpy as np
 
 
 
@@ -39,48 +43,46 @@ class EvolutionaryAlgorithm():
 
 class Individual():
 
-    
 
     def __init__(self,COD,D,bounds,seed=None):
-        self.chromossome = []
+        self.chromossome = np.array
         if seed != None:
             random.seed(seed)
-        self.gera_cromossomo(COD,D,bounds)
+        self.chromossome = self.gera_cromossomo(COD,D,bounds)
         pass
 
     def gera_cromossomo(self, COD,D, bounds=None):
         """
         Gera as variáveis do individuo
         """
-        if self.params_are_valid(COD,D,bounds):
-            if COD == 'bin':
-                for i in range(0,D):
-                    gene = random.randint(0,1)
-                    self.chromossome.append(gene)
-            elif COD == 'int':
-                for i in range(0,D):
-                    gene = random.randrange(bounds[0],bounds[1])
-                    self.chromossome.append(gene)
-            elif COD == 'int-perm':
-                for i in range(0,D):
-                    gene = random.randrange(bounds[0],bounds[1])
-                    self.chromossome.append(gene)
-            elif COD == 'real':
-                for i in range(0,D):
-                    gene = random.random(bounds[0],bounds[1])
-                    self.chromossome.append(gene)
-        else:
-            raise Exception("Combinação de parâmetros inválida")
+        #if self.params_are_valid(COD,D,bounds):
+        if COD == 'bin':
+            chromossome = np.random.choice(a=[False, True], size=D)
 
-        return
+        elif COD == 'int':
+            chromossome = np.random.randint(bounds[0],bounds[1],D)
+
+        elif COD == 'int-perm':
+            chromossome = np.arange(bounds[0],bounds[1])
+            np.random.shuffle(chromossome)
+            
+        elif COD == 'real':
+            chromossome = np.random.uniform(bounds[0],bounds[1],D)
+
+        #else:
+        #    raise Exception("Combinação de parâmetros inválida")
+
+        return (chromossome)
 
     def params_are_valid(self,COD, D, bounds):
-        if COD in ['int','int-perm','real']:
+        if COD in ['int','real']:
             if (bounds is None) or (bounds[0] >= bounds[1]) or (not isinstance(bounds,tuple)) or (len(bounds)>2):
+                return (False)
+        elif COD == 'int-perm':
+            if (bounds is None) or len(list(range(bounds[0],bounds[1])))!=D:
                 return (False)
         elif COD == 'bin':
             if bounds is not None:
-                print ("AAAAAAAAAA")
                 return (False)
         
         return (True)
@@ -89,10 +91,28 @@ class Individual():
         print (self.chromossome)
         return
 
+@jit(nopython=True,parallel=True)
+def hm(D,a,b):
+    chromossome = np.random.uniform(a,b,D)
+    return (chromossome)
+
 if __name__ == "__main__":
-    start = time.time()
+    
     ae = EvolutionaryAlgorithm()
-    ae.gera_pop('int',D=30,POP=5000,bounds=(-50,50))
-    ae.print_pop()
+
+    start = time.time()
+    #ae.gera_pop('bin',D=100,POP=5000)
+    #ae.gera_pop('int',D=100,POP=5000,bounds=(-5,5))
+    #ae.gera_pop('int-perm',D=10,POP=5000,bounds=(-5,5))
+    
+    ae.gera_pop('real',D=100000,POP=5000,bounds=(-5,5))
     end = time.time() - start 
-    print ("Tima taken: ",end," seconds")
+    start = time.time()
+    a = hm(1000000, -5,5)
+    end2 = time.time() - start
+    #ae.print_pop()
+
+    
+    
+    print ("Tima taken1: ",end," seconds")
+    print ("Tima taken2: ",end2," seconds")
