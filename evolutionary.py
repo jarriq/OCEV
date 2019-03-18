@@ -1,9 +1,9 @@
-
+# -*- coding: utf8 -*-
 import time
 import random
-import multiprocessing
-from numba import double
-from numba.decorators import jit, autojit
+#import multiprocessing
+#from numba import double
+#from numba.decorators import jit, autojit
 import numpy as np
 
 
@@ -19,11 +19,11 @@ class EvolutionaryAlgorithm():
         seed param: int, seed para geração de números aleatórios
         """
         self.params_are_valid(COD=COD,D=D,POP=POP,bounds=bounds)
-        
+
         self.list_pop = []
         self.COD = COD
         self.D = D
-        self.POP = POP 
+        self.POP = POP
         self.bounds = bounds
         self.seed = seed
 
@@ -57,7 +57,7 @@ class EvolutionaryAlgorithm():
             raise ValueError(POP + ": Tamanho de população inválido")
 
         if COD not in ["bin","int","int-perm","real"]:
-            raise ValueError(COD + ": Codificação inválida ou não suportada") 
+            raise ValueError(COD + ": Codificação inválida ou não suportada")
 
         if COD in ['int','real']:
             if (bounds is None) or (bounds[0] >= bounds[1]) or (not isinstance(bounds,tuple)) or (len(bounds)>2):
@@ -68,7 +68,7 @@ class EvolutionaryAlgorithm():
         elif COD == 'bin':
             if bounds is not None:
                 raise ValueError(COD + ": Combinação de parâmetros inválida")
-        
+
         return True
 
 
@@ -88,7 +88,7 @@ class Individual():
         Gera as genes(variáveis) do individuo
         """
         if COD == 'bin':
-            chromossome = np.random.choice(a=[False, True], size=D)
+            chromossome = random.getrandbits(D)
 
         elif COD == 'int':
             chromossome = np.random.randint(bounds[0],bounds[1],D)
@@ -96,7 +96,7 @@ class Individual():
         elif COD == 'int-perm':
             chromossome = np.arange(bounds[0],bounds[1])
             np.random.shuffle(chromossome)
-            
+
         elif COD == 'real':
             chromossome = np.random.uniform(bounds[0],bounds[1],D)
 
@@ -109,27 +109,26 @@ class Individual():
 
 
 if __name__ == "__main__":
-    
-    
+
+
 
     start = time.time()
     ae = EvolutionaryAlgorithm('bin',D=10,POP=10)
     ae.info()
     ae.print_pop()
-    
+
     ae = EvolutionaryAlgorithm('int',D=10,POP=10,bounds=(-5,5))
     ae.info()
     ae.print_pop()
-    
+
     ae = EvolutionaryAlgorithm('int-perm',D=10,POP=10,bounds=(0,10))
     ae.info()
     ae.print_pop()
-    
+
     ae = EvolutionaryAlgorithm('real',D=10,POP=10,bounds=(-10,10))
     ae.info()
     ae.print_pop()
-    
-    end = time.time() - start 
-    
+
+    end = time.time() - start
+
     print ("Tima taken: ",end," seconds")
-  
