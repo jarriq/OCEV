@@ -27,6 +27,7 @@ class EvolutionaryAlgorithm():
         self.bounds = bounds
         self.seed = seed
 
+        print ("Gerando População inicial...")
         self.gera_pop()
 
 
