@@ -10,48 +10,65 @@ import numpy as np
 
 class EvolutionaryAlgorithm():
 
-    list_pop = []
-
-    def __init__(self):
-        pass
-
-
-    def gera_pop(self, COD, POP, D, bounds=None,seed=None):
+    def __init__(self,COD=None,D=None,POP=None,bounds=None,seed=None):
         """
-        COD param: str, 'bin','int', 'int-perm', 'real'
-        bounds param: tuple, (lim_inferior,lim_superior)
-        POP: int, tamanho da população
+        COD param: str, ('bin','int', 'int-perm', 'real') codificações possiveis
         D: int, tamanho do cromossomo (número de variáveis)
+        POP: int, tamanho da população
+        bounds param: tuple, (lim_inferior,lim_superior)
+        seed param: int, seed para geração de números aleatórios
         """
-        if POP <= 0:
-            raise ValueError("Tamanho de população inválido")
+        self.params_are_valid(COD=COD,D=D,POP=POP,bounds=bounds)
+        
+        self.list_pop = []
+        self.COD = COD
+        self.D = D
+        self.POP = POP 
+        self.bounds = bounds
+        self.seed = seed
 
-        if COD not in ["bin","int","int-perm","real"]:
-            raise ValueError("Codificação inválida ou não suportada")
+        self.gera_pop()
 
-        if self.params_are_valid(COD=COD,D=D,bounds=bounds):
-            for _ in range(POP):
-                self.list_pop.append(Individual(COD=COD,D=D,bounds=bounds))
-        else:
-            raise Exception("Combinação de parâmetros inválida")
+
+    def gera_pop(self, seed=None):
+        """
+        Gera a população com base nos parametros de inicialização
+        """
+        for _ in range(self.POP):
+            self.list_pop.append(Individual(COD=self.COD,D=self.D,bounds=self.bounds,seed=self.seed))
+
+    def info(self):
+        print ("[Info]")
+        print (" - COD: "+str(self.COD))
+        print (" - D: "+str(self.D))
+        print (" - POP: "+str(self.POP))
+        print (" - bounds: "+str(self.bounds))
+        print (" - seed: "+str(self.seed))
 
     def print_pop(self):
+        print ("[Population = "+str(self.POP)+"]")
         for i in range(0,len(self.list_pop)):
-            print ("Individual ", i+1, ":",self.list_pop[i].chromossome)
+            print (" - " + str(i+1) + " ->",self.list_pop[i].chromossome)
         return
 
-    def params_are_valid(self,COD, D, bounds):
+    def params_are_valid(self,COD, D, POP, bounds):
+        if POP <= 0:
+            raise ValueError(POP + ": Tamanho de população inválido")
+
+        if COD not in ["bin","int","int-perm","real"]:
+            raise ValueError(COD + ": Codificação inválida ou não suportada") 
+
         if COD in ['int','real']:
             if (bounds is None) or (bounds[0] >= bounds[1]) or (not isinstance(bounds,tuple)) or (len(bounds)>2):
-                return (False)
+                raise ValueError(COD + ": Combinação de parâmetros inválida")
         elif COD == 'int-perm':
             if (bounds is None) or len(list(range(bounds[0],bounds[1])))!=D:
-                return (False)
+                raise ValueError(COD + ": Combinação de parâmetros inválida")
         elif COD == 'bin':
             if bounds is not None:
-                return (False)
+                raise ValueError(COD + ": Combinação de parâmetros inválida")
         
-        return (True)
+        return True
 
 
 
@@ -63,11 +80,11 @@ class Individual():
         if seed != None:
             random.seed(seed)
         self.chromossome = self.gera_cromossomo(COD,D,bounds)
-        pass
+
 
     def gera_cromossomo(self, COD,D, bounds=None):
         """
-        Gera as variáveis do individuo
+        Gera as genes(variáveis) do individuo
         """
         if COD == 'bin':
             chromossome = np.random.choice(a=[False, True], size=D)
@@ -92,16 +109,26 @@ class Individual():
 
 if __name__ == "__main__":
     
-    ae = EvolutionaryAlgorithm()
+    
 
     start = time.time()
-    ae.gera_pop('bin',D=10,POP=10)
-    ae.gera_pop('int',D=10,POP=10,bounds=(-5,5))
-    ae.gera_pop('int-perm',D=10,POP=10,bounds=(0,10))
-    ae.gera_pop('real',D=10,POP=10,bounds=(-10,10))
-    end = time.time() - start 
-
+    ae = EvolutionaryAlgorithm('bin',D=10,POP=10)
+    ae.info()
     ae.print_pop()
+    
+    ae = EvolutionaryAlgorithm('int',D=10,POP=10,bounds=(-5,5))
+    ae.info()
+    ae.print_pop()
+    
+    ae = EvolutionaryAlgorithm('int-perm',D=10,POP=10,bounds=(0,10))
+    ae.info()
+    ae.print_pop()
+    
+    ae = EvolutionaryAlgorithm('real',D=10,POP=10,bounds=(-10,10))
+    ae.info()
+    ae.print_pop()
+    
+    end = time.time() - start 
     
     print ("Tima taken: ",end," seconds")
   
