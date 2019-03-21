@@ -40,4 +40,4 @@ if __name__ == "__main__":
     input_params = read_input(os.path.dirname(os.path.abspath(__file__))+"/input.txt")
 
 
-    ga.EvolutionaryAlgorithm(**input_params)
+    ga.EvolutionaryAlgorithm(COD=input_params["COD"],POP=input_params["POP"],**(input_params.pop("COD").pop("POP")))

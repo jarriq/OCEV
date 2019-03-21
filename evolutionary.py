@@ -2,9 +2,6 @@
 import time
 import random
 import os
-#import multiprocessing
-#from numba import double
-#from numba.decorators import jit, autojit
 import numpy as np
 import individual as ind
 
@@ -24,7 +21,7 @@ class IndvidualFactory():
 
 class EvolutionaryAlgorithm():
 
-    def __init__(self,input_params):
+    def __init__(self,COD,POP,**kwargs):
         """
         COD param: str, ('bin','int', 'int-perm', 'real') codificações possiveis
         D: int, tamanho do cromossomo (número de variáveis)
@@ -32,16 +29,15 @@ class EvolutionaryAlgorithm():
         bounds param: tuple, (lim_inferior,lim_superior)
         seed param: int, seed para geração de números aleatórios
         """
-        for param in input_params.keys():
-             
+        
         
         print ("Gerando População inicial...")
         self.list_pop = []
-        self.gera_pop()
-        self.COD = 
+        self.COD = COD
+        self.POP = POP
+        self.gera_pop(self.COD)
 
-
-    def gera_pop(self, seed=None):
+    def gera_pop(self, COD):
         """
         Gera a população com base nos parametros de inicialização
         """
