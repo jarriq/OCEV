@@ -1,0 +1,7 @@
+COD=bin
+D=10
+POP=10
+low_bound=#
+high_bound=#
+fitness=#
+seed=#
