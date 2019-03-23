@@ -18,7 +18,8 @@ def read_input(input_path):
         "D":None,
         "POP":None,
         "low_bound":None,
-        "high_bound":None}
+        "high_bound":None,
+        "fitness":None}
     
     with open(input_path, "r") as f:
         for line in f:
@@ -33,11 +34,7 @@ def read_input(input_path):
     return (dic_params)
 
 
-
-
 if __name__ == "__main__":
     
     input_params = read_input(os.path.dirname(os.path.abspath(__file__))+"/input.txt")
-
-
-    ga.EvolutionaryAlgorithm(COD=input_params["COD"],POP=input_params["POP"],**(input_params.pop("COD").pop("POP")))
+    ga.EvolutionaryAlgorithm(input_params)

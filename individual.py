@@ -4,11 +4,10 @@ import numpy as np
 
 class Individual():
 
-    def __init__(self,COD,D,low_bound,high_bound,seed=None):
-        self.chromossome = np.array
-        if seed != None:
-            random.seed(seed)
-        
+    def __init__(self):
+        self.D = None
+        self.chromossome = None
+
     def print_individual(self):
         print (self.chromossome)
         return
@@ -16,20 +15,22 @@ class Individual():
 
 class Binary(Individual):
 
-    def __init__(self,D):
-        self.validade_params(D)
-        self.chromossome = self.generate_chromossome(D)
+    def __init__(self,**kwargs): 
+        super().__init__()
+        self.validade_params(kwargs)
+        self.chromossome = self.generate_chromossome(kwargs["D"])
         
     def validade_params(self,D):
         pass
 
     def generate_chromossome(self,D):
-        return ("".join(str(random.choice("01")) for i in range(D)))
+        return ("".join(str(random.choice("01")) for i in range(int(D))))
 
 
 class Integer(Individual):
 
     def __init__(self,D,low_bound,high_bound):
+        super().__init__()
         self.validade_params(D)
         self.chromossome = self.generate_chromossome(D,low_bound,high_bound)
 
@@ -42,6 +43,7 @@ class Integer(Individual):
 class PermutedInteger(Individual):
 
     def __init__(self,D,low_bound,high_bound):
+        super().__init__()
         self.validade_params(D,low_bound,high_bound)
         self.chromossome = self.generate_chromossome(D,low_bound,high_bound)
 
@@ -56,6 +58,7 @@ class PermutedInteger(Individual):
 class Real(Individual):
 
     def __init__(self,D,low_bound,high_bound):
+        super().__init__()
         self.validade_params(D,low_bound,high_bound)
         self.chromossome = self.generate_chromossome(D,low_bound,high_bound)
 
