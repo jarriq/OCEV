@@ -30,40 +30,47 @@ class EvolutionaryAlgorithm():
         """ 
             
         print ("Gerando População inicial...")
-        self.list_pop = []
+        self.population = []
         self.COD = input_params["COD"]
         self.POP = int(input_params["POP"])
         self.D = int(input_params["D"])
         self.fitness_func = eval("fit." + input_params["fitness"])
+
         self.gerenerate_population(input_params)
-        best,worst = self.get_fitness()
+        self.get_fitness()
         self.info()
         self.print_pop()
-        print ("best:",best,"worst:",worst)
+
 
     def gerenerate_population(self, input_params):
         """
         Gera a população com base nos parametros de inicialização
         """
         for _ in range(self.POP):
-            self.list_pop.append(IndvidualFactory.create_individual(self.COD,**input_params))
+            self.population.append(IndvidualFactory.create_individual(self.COD,**input_params))
 
     def get_fitness(self):
-        start = time.time()
+        """
+        TODO DOC
+        """
         best = -1
-        worst = 100000
-        for ind in self.list_pop:
+        worst = 9999
+        start = time.time()
+        for ind in self.population:
             ind.fitness = self.fitness_func(ind.chromossome)
             if ind.fitness > best:
                 best = ind.fitness
             if ind.fitness < worst:
                 worst = ind.fitness
-
         end = time.time() - start
         print ("time:", end)
-        return (best,worst)
+        print ("best: ", best, "worst:", worst)
+
 
     def info(self):
+        """
+        TODO DOC
+        """
         print ("[Info]")
         print (" - COD: "+str(self.COD))
         print (" - D: "+str(self.D))
@@ -71,9 +78,13 @@ class EvolutionaryAlgorithm():
         #print (" - bounds: ["+str(self.low_bound)+","+str(self.high_bound)+"]")
 
     def print_pop(self):
+        """
+        TODO DOC
+        """
         print ("[Population = "+str(self.POP)+"]")
-        for i in range(0,len(self.list_pop)):
-            print (" - " + str(i + 1) + " ->",self.list_pop[i].chromossome, "-> fit: ", round(self.list_pop[i].fitness,5) )
+        for i in range(0,len(self.population)):
+            print (" " + str(i + 1) + " ->",self.population[i].chromossome,
+                   "-> fit: ", round(self.population[i].fitness,5))
         return
 
 

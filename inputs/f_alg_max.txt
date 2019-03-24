@@ -1,0 +1,7 @@
+COD=bin
+D=1
+POP=10
+low_bound=-2
+high_bound=2
+fitness=max_f_alg_exer
+precision=4
