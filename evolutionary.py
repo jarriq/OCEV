@@ -15,7 +15,6 @@ class IndvidualFactory():
  
     @staticmethod
     def create_individual(cod, **kwargs):
-            print (cod)
             return IndvidualFactory.types[cod](**kwargs)
 
 
@@ -28,24 +27,41 @@ class EvolutionaryAlgorithm():
         POP: int, tamanho da população
         bounds param: tuple, (lim_inferior,lim_superior)
         seed param: int, seed para geração de números aleatórios
-        """
-        
-        for key, value in input_params.items(): 
-            print ("%s = %s" %(key, value)) 
+        """ 
             
         print ("Gerando População inicial...")
         self.list_pop = []
         self.COD = input_params["COD"]
         self.POP = int(input_params["POP"])
         self.D = int(input_params["D"])
-        self.gera_pop(input_params)
+        self.fitness_func = eval("fit." + input_params["fitness"])
+        self.gerenerate_population(input_params)
+        best,worst = self.get_fitness()
+        self.info()
+        self.print_pop()
+        print ("best:",best,"worst:",worst)
 
-    def gera_pop(self, input_params):
+    def gerenerate_population(self, input_params):
         """
         Gera a população com base nos parametros de inicialização
         """
         for _ in range(self.POP):
             self.list_pop.append(IndvidualFactory.create_individual(self.COD,**input_params))
+
+    def get_fitness(self):
+        start = time.time()
+        best = -1
+        worst = 100000
+        for ind in self.list_pop:
+            ind.fitness = self.fitness_func(ind.chromossome)
+            if ind.fitness > best:
+                best = ind.fitness
+            if ind.fitness < worst:
+                worst = ind.fitness
+
+        end = time.time() - start
+        print ("time:", end)
+        return (best,worst)
 
     def info(self):
         print ("[Info]")
@@ -57,7 +73,7 @@ class EvolutionaryAlgorithm():
     def print_pop(self):
         print ("[Population = "+str(self.POP)+"]")
         for i in range(0,len(self.list_pop)):
-            print (" - " + str(i) + " ->",self.list_pop[i].chromossome)
+            print (" - " + str(i + 1) + " ->",self.list_pop[i].chromossome, "-> fit: ", round(self.list_pop[i].fitness,5) )
         return
 
 

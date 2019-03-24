@@ -1,3 +1,6 @@
-COD=bin
-D=10
-POP=10
+COD=int-perm
+D=16
+POP=100000
+low_bound=0
+high_bound=15
+fitness=n_queens
