@@ -49,8 +49,6 @@ def read_input(input_path):
             except:
                 print ("Parâmetro não interpretado: ",p_name)
 
-    dic_params = {k: v for k, v in dic_params.items() if v is not None}
-
     return (dic_params)
 
 

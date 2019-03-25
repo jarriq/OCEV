@@ -1,0 +1,7 @@
+COD=bin
+D=find
+NVAR=2
+low_bound=[0,0]
+high_bound=[24,16]
+POP=100
+fitness=fab_radios

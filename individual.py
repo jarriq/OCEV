@@ -22,7 +22,8 @@ class Binary(Individual):
     def __init__(self,**kwargs): 
         super().__init__()
         self.validade_params(kwargs)
-        self.D = int(kwargs["D"])
+        print (kwargs)
+        self.D = set_D(kwargs["D"])
         if kwargs["low_bound"] is not None or kwargs["high_bound"] is not None:
             self.low_bound = int(kwargs["low_bound"])
             self.high_bound = int(kwargs["high_bound"])
@@ -32,10 +33,26 @@ class Binary(Individual):
         self.b_chromossome = self.generate_chromossome(L)
         print (self.b_chromossome)
         self.chromossome = utils.scale_adjust(self.b_chromossome, self.low_bound, self.high_bound, self.D,L)
-        
+
+    def set_bounds(self, low_bound, high_bound):
+        if isinstance(int,eval(low_bound)):
+            return ([low_bound],[high_bound])
+        elif isinstance(list,eval(low_bound))
+            return (low_bound,high_bound)
+
+
+    def set_D(self,D, low_bound, high_bound, precision):
+        if D == "find":
+            D = 0
+            for l,h in zip(low_bound,high_bound):
+                D += utils.find_L(l,h,precision=precision)
+            return (D)
+        elif int(D) < 0:
+            raise ValueError("D precisa ser maior que zero")
+        else:
+            return (int(D))
+
     def validade_params(self,params):
-        if int(params["D"]) < 0:
-            raise Exception("Valor para D menor que 0")
         if self.low_bound is not None or self.high_bound is not None:
             if int(params["low_bound"]) > int(params["high_bound"]):
                 raise Exception("Valor para bounds inválido")
