@@ -1,4 +1,4 @@
 COD=int-perm
 D=32
-POP=1000
+POP=20
 fitness=n_queens

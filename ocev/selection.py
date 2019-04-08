@@ -81,14 +81,71 @@ def uniform_rank(list_pop):
 
     return selected_pop
 
-def stochastic_tourney(list_pop):
+def stochastic_tourney(list_pop, k=2, kp=1, method='worst'):
     """
-    TODO DOC
+    param int k [0,N] = numero de individus do torneio 
+    param float [0,1] kp = probabilidade de escolher o primero
+    param str method =  worst - o segundo escolhido é o pior
+                        random - o segundo escolhido é aleatorio fora o melhor
     """
-    pass
+    selected = []
+    for _ in range(len(list_pop)):
+        tourney = []
+        for _ in range(k):
+            rand = random.randint(0,len(list_pop)-1)
+            tourney.append(list_pop[rand])
+        rand = random.random()
+        tourney = sorted(tourney, key=lambda x: x.fitness,reverse=True)
+        if kp >= rand:
+            selected.append(tourney[0])
+        else:
+            if method == 'worst':
+                selected.append(tourney[-1])
+            elif method == 'random':
+                rand = random.randint(1,len(list_pop))
+                selected.append(tourney[rand])
+            else:
+                raise ValueError("Método inválido")
 
-def local_selection(list_pop):
+    return selected
+            
+
+def local_selection(list_pop, r=2, method='best'):
     """
-    TODO DOC
+    param int r: raio da vizinhança
+    param str method: metodo pra selecao do segundo
+                        'best': melhor da vizinhanca
+                        'random': aleatorio da vizinhaca
+                        'fitness-prop': roleta proporcional ao fitness
     """
-    pass
+    selected = []
+    for _ in range(int(len(list_pop)/2)):
+        rand = random.randint(0,len(list_pop)-1)
+        selected.append(list_pop[rand])
+        neighbourhood = []
+        for i in range(-r,r):
+            if i != rand:
+                if rand+i >= len(list_pop):
+                   neighbourhood.append(list_pop[rand+i-len(list_pop)])
+                else:
+                    neighbourhood.append(list_pop[rand+i])
+        neighbourhood = sorted(neighbourhood, key=lambda x: x.fitness,reverse=True)
+        if method == 'best':
+            selected.append(neighbourhood[0])
+        elif method == 'random':
+            rand = random.randint(0,len(neighbourhood)-1)
+            selected.append(neighbourhood[rand])
+        elif method == 'fitness-prop':
+            rand = random.random()
+            list_raw_fitness = [ind.fitness for ind in neighbourhood]
+            sum_fitness = np.sum(list_raw_fitness)
+            list_rel_fitness = [rf/sum_fitness for rf in list_raw_fitness]
+            sum_r = 0
+            for index,j in enumerate(list_rel_fitness):
+                sum_r += j
+                if sum_r > rand:
+                    selected.append(neighbourhood[index])
+                    break
+        else:
+            raise ValueError("Método inválido")
+    return selected

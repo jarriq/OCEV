@@ -48,6 +48,18 @@ class EvolutionaryAlgorithm():
         self.print_pop(selected)
         selected = sel.uniform_rank(self.population)
         self.print_pop(selected)
+        print ("TOURNEY")
+        selected = sel.stochastic_tourney(self.population)
+        self.print_pop(selected)
+        print ("LOCAL FITPROP")
+        selected = sel.local_selection(self.population, method='fitness-prop')
+        self.print_pop(selected)
+        print ("LOCAL RANDOM")
+        selected = sel.local_selection(self.population, method='random')
+        self.print_pop(selected)
+        print ("LOCAL BEST")
+        selected = sel.local_selection(self.population)
+        self.print_pop(selected)
 
     def gerenerate_population(self, input_params):
         """
