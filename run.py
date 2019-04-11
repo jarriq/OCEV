@@ -1,16 +1,9 @@
-import os
-import ocev.evolutionary as ga
+"""
+Parses input files and executes the GA
+"""
 
-"""
-Default input format:
-    COD='bin','int','int-perm','real'
-    D=int
-    POP=int
-    low_bound=float,int
-    high_bound=float,int
-    fitness=str,
-    precision=0.1,0.01,0.001 ... para codificação binária
-"""
+import os
+import ocev.evolutionary as GA
 
 def select_input_files():
     folder = os.path.dirname(os.path.abspath(__file__))+"/inputs/"
@@ -32,27 +25,48 @@ def select_input_files():
     return (files[int(n)])
 
 def read_input(input_path):
-    dic_params = {
-        "COD":None,
-        "D":None,
-        "POP":None,
-        "low_bound":None,
-        "high_bound":None,
-        "fitness":None,
-        "precision":None}
+    ga_args = {"cod":None,
+                "gen":None,
+                "pop":None}
     
+    individual_args = {"dim":None,
+                        "bounds":None,
+                        "fitness":None,
+                        "precision":0}
+
+    selection_args = {"selection":None}
+
+    operators_args = {"crossover"
+    :None,
+                        "mutation":None}
+            
     with open(input_path, "r") as f:
         for line in f:
-            p_name,p_value = line.strip("\n").split("=")
+            line = line.rstrip('\n')
+            if str(line).endswith(":"):
+                step = eval(line.split(":")[0] + "_args")
+                continue
+            print (line)
+            p_name,p_value = line.split("=",1)
             try:
-                dic_params[p_name] = p_value
+                if p_name not in step.keys():
+                    raise ValueError("Parâmetro inválido: ",p_name)
+                else:
+                    if p_name not in ["fitness","selection","crossover","mutation"]:
+                        step[p_name] = eval(p_value)
+                    else:
+                        step[p_name] = p_value
             except:
-                print ("Parâmetro não interpretado: ",p_name)
+                raise ValueError("Parâmetro não interpretado: ",p_name)
 
-    return (dic_params)
+    return (ga_args,individual_args,selection_args,operators_args)
 
 
 if __name__ == "__main__":
     file = select_input_files()
-    input_params = read_input(file)
-    ga.EvolutionaryAlgorithm(input_params)
+    ga,ind,sel,opr = read_input(file)
+    print(ga)
+    print(ind)
+    print(sel)
+    print(opr)
+    GA.EvolutionaryAlgorithm(ga,ind,sel,opr)

@@ -1,0 +1,14 @@
+ga:
+cod='bin'
+gen=10
+pop=10
+individual:
+dim=5
+bounds={'low':[0,0],'high':[16,20]}
+precision=0
+fitness=fab_radios
+selection:
+selection=stocastic_tourney(population,k=1,kp=2,method='best')
+operators:
+crossover=binary_crossover(population, method='2-point')
+mutation=mutation_bitflip(population, percent='0.05')
