@@ -1,4 +1,14 @@
-COD=int-perm
-D=16
-POP=10
+ga:
+cod='int-perm'
+gen=10000
+pop=5000
+elite=True
+individual:
+dim=16
+bounds={'low':[0],'high':[16]}
 fitness=n_queens
+selection:
+selection=stochastic_tourney(self.population,k=1,kp=2,method='random')
+operators:
+crossover=permuted_crossover(self.population, ratio=0.8)
+mutation=permuted_mutation(self.population, perc=0.05)

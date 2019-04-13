@@ -22,6 +22,10 @@ class Individual():
         print("-Precision: ",self.precision) 
         return
 
+    def bounds_ok(self):
+        pass
+        
+
 class Binary(Individual):
 
     def __init__(self, ind_args): 
@@ -31,16 +35,21 @@ class Binary(Individual):
         self.precision = 10**-(ind_args["precision"])
         
         self.L = utils.find_L(self.nvars, self.bounds, self.precision)
-        print(self.L)
         self.dim = sum(self.L)
-        print(self.dim)
+
         self.b_chromossome = self.generate_chromossome(self.dim)
-        print(self.b_chromossome)
-        self.chromossome = utils.scale_adjust(self.b_chromossome, self.bounds, self.L, self.precision)
-        print(self.chromossome)
+        #print(self.b_chromossome)
+        self.chromossome = np.array(utils.scale_adjust(self.b_chromossome, self.bounds, self.L, self.precision))
+        #print(self.chromossome)
 
     def generate_chromossome(self, dim):
         return ("".join(str(random.choice("01")) for i in range(int(dim))))
+
+    def bounds_ok(self):
+        for i, c in enumerate(self.chromossome):
+            if not (self.bounds['low'][i] <= c <= self.bounds['high'][i]):
+                return False
+        return True
 
 
 class Integer(Individual):
@@ -59,11 +68,12 @@ class PermutedInteger(Individual):
     def __init__(self,ind_args):
         super().__init__()
         self.dim = ind_args['dim']
-        self.chromossome = self.generate_chromossome(self.dim,self.bounds)
+        self.bounds = ind_args['bounds']
+        self.chromossome = self.generate_chromossome(self.bounds)
 
 
-    def generate_chromossome(self,D,bounds):
-        chromossome = np.arange(bounds['low'],bounds['high'])
+    def generate_chromossome(self,bounds):
+        chromossome = np.arange(bounds['low'][0],bounds['high'][0])
         np.random.shuffle(chromossome)
         return (chromossome)
 

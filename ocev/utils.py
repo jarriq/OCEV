@@ -38,5 +38,5 @@ def find_L(nvars, bounds, precision=None):
 
 
 if __name__ == "__main__":
-    print (find_L(2,{'high':[16,20],'low':[0,0]},1))
+    print (find_L(2,{'high':[16,24],'low':[0,0]},1))
 

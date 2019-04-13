@@ -27,7 +27,8 @@ def select_input_files():
 def read_input(input_path):
     ga_args = {"cod":None,
                 "gen":None,
-                "pop":None}
+                "pop":None,
+                "elite":False}
     
     individual_args = {"dim":None,
                         "bounds":None,

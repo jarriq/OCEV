@@ -1,14 +1,15 @@
 ga:
 cod='bin'
-gen=10
-pop=10
+gen=100
+pop=500
+elite=True
 individual:
 dim=5
-bounds={'low':[0,0],'high':[16,20]}
+bounds={'low':[0,0],'high':[24,16]}
 precision=0
 fitness=fab_radios
 selection:
-selection=stocastic_tourney(population,k=1,kp=2,method='best')
+selection=stochastic_tourney(self.population,k=1,kp=2,method='random')
 operators:
-crossover=binary_crossover(population, method='2-point')
-mutation=mutation_bitflip(population, percent='0.05')
+crossover=binary_crossover(self.population, ratio=0.8, method='1-point')
+mutation=binary_mutation(self.population, perc=0.05)

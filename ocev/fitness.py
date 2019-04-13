@@ -1,6 +1,6 @@
 import math
 from numba import jit,njit
-from numba import int64,float32
+from numba import int64,float32,float64
 import numpy as np
 
 @njit(float32(int64[:]),parallel=True)
@@ -24,8 +24,8 @@ def max_f_alg_exer(x):
 def min_f_alg_exer(x):
     return (4 + math.cos(20*x) - abs(x)/2 + (x**3)/4)
 
-@njit(float32(int64[:]),parallel=True)
+@njit(float32(float64[:]),parallel=True)
 def fab_radios(chromosome):
     fit = (30*chromosome[0] + 40*chromosome[1])/1360
-    restr = max(0,(chromosome[0] + 2*chromosome[1])-40/16)
+    restr = max(0,(chromosome[0] + 2*chromosome[1]-40)/16)
     return (fit - restr)
