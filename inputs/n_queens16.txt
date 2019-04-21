@@ -1,14 +1,14 @@
 ga:
 cod='int-perm'
-gen=10000
-pop=5000
+gen=100
+pop=10
 elite=True
 individual:
 dim=16
 bounds={'low':[0],'high':[16]}
 fitness=n_queens
 selection:
-selection=stochastic_tourney(self.population,k=1,kp=2,method='random')
+selection=stochastic_tourney(self.generations[i].population,k=1,kp=2,method='best')
 operators:
-crossover=permuted_crossover(self.population, ratio=0.8)
-mutation=permuted_mutation(self.population, perc=0.05)
+crossover=permuted_crossover(new_population, ratio=0.8)
+mutation=permuted_mutation(new_population, perc=0.05)

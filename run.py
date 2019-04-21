@@ -37,9 +37,9 @@ def read_input(input_path):
 
     selection_args = {"selection":None}
 
-    operators_args = {"crossover"
-    :None,
-                        "mutation":None}
+    crossover_args = {"crossover":None}
+                        
+    mutation_args = {"mutation":None}
             
     with open(input_path, "r") as f:
         for line in f:

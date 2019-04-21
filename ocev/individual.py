@@ -51,6 +51,8 @@ class Binary(Individual):
                 return False
         return True
 
+    def reajust(self):
+        self.chromossome = np.array(utils.scale_adjust(self.b_chromossome, self.bounds, self.L, self.precision))
 
 class Integer(Individual):
 

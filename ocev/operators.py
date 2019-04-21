@@ -15,6 +15,7 @@ class BinaryOperator():
         param ratio: float, best between 0.8 and 1.0
         param method: "1-point","2-point"
         """
+
         for i in range(0,len(population),2):
             if i <= ratio*len(population):
                 ind1 = list(population[i].b_chromossome)
@@ -28,6 +29,8 @@ class BinaryOperator():
                 
                 population[i].b_chromossome = "".join(c1)
                 population[i+1].b_chromossome = "".join(c2)
+                population[i].reajust()
+                population[i+1].reajust()
             else:
                 break
 
@@ -47,7 +50,7 @@ class BinaryOperator():
                         population[i].b_chromossome = aux[:bit_pos] + '0' + aux[bit_pos+1:]
                     else:
                         population[i].b_chromossome = aux[:bit_pos] + '1' + aux[bit_pos+1:]
-        
+                    population[i].reajust()
         return population
     
 class IntegerOperator():

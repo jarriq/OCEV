@@ -7,13 +7,15 @@ import numpy as np
 def n_queens(chromosome):
     clashes = abs(len(chromosome) - len(np.unique(chromosome)))
 
-    for i in range(len(chromosome)):
-        for j in range(len(chromosome)):
-            if ( i != j):
+    for i in range(0, len(chromosome)):
+        for j in range(1, len(chromosome)):
+            if (i != j):
                 dx = abs(i-j)
                 dy = abs(chromosome[i] - chromosome[j])
                 if(dx == dy):
                     clashes += 1
+    
+
     return (1/(1+clashes))
 
 @njit(float32(float32),parallel=True)
