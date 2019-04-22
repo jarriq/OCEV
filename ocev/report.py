@@ -19,11 +19,14 @@ class Report():
         print(best_fitness)
         worst_fitness = [gen.worst.fitness for gen in self.data]
         print(worst_fitness)
-        mean_fitness = [gen.mean for gen in self.data]
-        print(mean_fitness)
+        average_fitness = [gen.average for gen in self.data]
+        print(average_fitness)
 
-        plt.plot(generation,best_fitness,"green")
-        plt.plot(generation,mean_fitness,"black")
-        #plt.plot(generation,worst_fitness,"red")
 
+        plt.plot(generation,best_fitness,"blue")
+        plt.plot(generation,average_fitness,"black")
+        plt.plot(generation,worst_fitness,"red")
+        plt.grid(axis='both')
+        plt.xlabel('Geração')
+        plt.ylabel('Fitness')
         plt.show()

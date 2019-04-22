@@ -1,4 +1,5 @@
 import random
+import copy
 import deap.tools.crossover as deap_cros
 import deap.tools.mutation as deap_mut
 from ocev.individual import Binary, Integer, PermutedInteger, Real
@@ -15,11 +16,15 @@ class BinaryOperator():
         param ratio: float, best between 0.8 and 1.0
         param method: "1-point","2-point"
         """
-
+        population = copy.deepcopy(population)
         for i in range(0,len(population),2):
-            if i <= ratio*len(population):
+            if random.random() <= ratio:
                 ind1 = list(population[i].b_chromossome)
                 ind2 = list(population[i+1].b_chromossome)
+                print(">>>>>>>")
+                print(population[i].b_chromossome,population[i].chromossome)
+                print(population[i+1].b_chromossome,population[i+1].chromossome)
+                print("----")
                 if method == "1-point":
                     c1, c2 = deap_cros.cxOnePoint(ind1,ind2)
                 elif method == "2-point":
@@ -31,26 +36,32 @@ class BinaryOperator():
                 population[i+1].b_chromossome = "".join(c2)
                 population[i].reajust()
                 population[i+1].reajust()
-            else:
-                break
+                print(population[i].b_chromossome,population[i].chromossome)
+                print(population[i+1].b_chromossome,population[i+1].chromossome)
+        
 
         return population
             
     def binary_mutation(self, population, perc=0.05):
-        n_mutations = int(len(population)*perc)
+        population = copy.deepcopy(population)
+        for ind in population:
+            if random.random() <= perc:
+                print(ind.chromossome)
+                print(ind.b_chromossome)
+                for bit_pos, bit in enumerate(ind.b_chromossome):
+                    rand = random.choice([True,False])
+                    if rand == True:
+                        aux = ind.b_chromossome
+                        if aux[bit_pos] == '1':
+                            ind.b_chromossome = aux[:bit_pos] + '0' + aux[bit_pos+1:]
+                        else:
+                            ind.b_chromossome = aux[:bit_pos] + '1' + aux[bit_pos+1:]
+                        
+                ind.reajust()        
+                print("reaj:",ind.chromossome)
+                print(ind.b_chromossome)
+        
 
-        i_to_mutate = random.sample(range(0,len(population)), n_mutations)
-
-        for i in i_to_mutate:
-            for bit_pos, bit in enumerate(population[i].b_chromossome):
-                rand = random.choice([True,False])
-                if rand == True:
-                    aux = population[i].b_chromossome
-                    if aux[bit_pos] == '1':
-                        population[i].b_chromossome = aux[:bit_pos] + '0' + aux[bit_pos+1:]
-                    else:
-                        population[i].b_chromossome = aux[:bit_pos] + '1' + aux[bit_pos+1:]
-                    population[i].reajust()
         return population
     
 class IntegerOperator():

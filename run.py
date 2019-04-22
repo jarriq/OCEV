@@ -47,27 +47,27 @@ def read_input(input_path):
             if str(line).endswith(":"):
                 step = eval(line.split(":")[0] + "_args")
                 continue
+            if line == len(line) * line[0]:
+                continue
             print (line)
             p_name,p_value = line.split("=",1)
             try:
-                if p_name not in step.keys():
-                    raise ValueError("Parâmetro inválido: ",p_name)
+                if p_name not in ["fitness","selection","crossover","mutation"]:
+                    step[p_name] = eval(p_value)
                 else:
-                    if p_name not in ["fitness","selection","crossover","mutation"]:
-                        step[p_name] = eval(p_value)
-                    else:
-                        step[p_name] = p_value
+                    step[p_name] = p_value
             except:
                 raise ValueError("Parâmetro não interpretado: ",p_name)
 
-    return (ga_args,individual_args,selection_args,operators_args)
+    return (ga_args,individual_args,selection_args,crossover_args, mutation_args)
 
 
 if __name__ == "__main__":
     file = select_input_files()
-    ga,ind,sel,opr = read_input(file)
+    ga,ind,sel,cros,mut = read_input(file)
     print(ga)
     print(ind)
     print(sel)
-    print(opr)
-    GA.EvolutionaryAlgorithm(ga,ind,sel,opr)
+    print(cros)
+    print(mut)
+    GA.EvolutionaryAlgorithm(ga,ind,sel,cros,mut)

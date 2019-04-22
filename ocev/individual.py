@@ -24,8 +24,8 @@ class Individual():
 
     def bounds_ok(self):
         pass
-        
 
+        
 class Binary(Individual):
 
     def __init__(self, ind_args): 
