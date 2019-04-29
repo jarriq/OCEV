@@ -32,13 +32,13 @@ class Generation():
         self.n_rest_broken = cont
 
     def set_values(self):
-        print([ind.fitness for ind in self.population])
+        #print([ind.fitness for ind in self.population])
         self.best = max(self.population, key=attrgetter('fitness'))
-        print()
         self.worst = min(self.population, key=attrgetter('fitness'))
         self.average = np.average([ind.fitness for ind in self.population])
 
     def print(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
         #print("pop: ",self.population)
         print("best_fit: ",self.best.fitness)
         print("worst_fit: ",self.worst.fitness)
@@ -83,53 +83,72 @@ class EvolutionaryAlgorithm():
         gen = Generation(self.population)
         pop = gen.population[:]
         self.generations.append(gen)
-        
-        while len(self.generations) < self.n_gen:
+        try:
+            while len(self.generations) < self.n_gen:
 
-            pop = deepcopy(pop)
+                pop = deepcopy([deepcopy(p) for p in pop])
 
-            self.get_fitness(pop, self.fitness_func)
-            if self.elite:
-                best = deepcopy(max(pop, key=attrgetter('fitness')))
-                print("BEST:",best.fitness)
+                pop2 = self.get_fitness(pop, self.fitness_func)
+                if self.elite:
+                    best = deepcopy(max(pop, key=attrgetter('fitness')))
+                    print("BEST:",best.fitness)
+                    
+
                 
+                print("SELECTION ----------------------------------------")
+                print("before:")
+                print([p.chromossome for p in pop])
+                print([p.fitness for p in pop])
+                print(np.mean([p.fitness for p in pop]))
+                
+                selected = self.selection_func(pop2,**sel_args)
 
-            """
-            print("SELECTION ----------------------------------------")
-            print("before:")
-            print([p.chromossome for p in pop])
-            print([p.fitness for p in pop])
-            print(np.mean([p.fitness for p in pop]))
-            """
-            selected = self.selection_func(pop,**sel_args)
+                
+                print("after:")
+                print([sel.chromossome for sel in selected])
+                print([sel.fitness for sel in selected])
+                print(np.mean([sel.fitness for sel in selected]))
+                
+                #print("CROSSOVER --------")
+                #print("before:")
+                #print([sel.chromossome for sel in selected])
 
-            """
-            print("after:")
-            print([sel.chromossome for sel in selected])
-            print([sel.fitness for sel in selected])
-            print(np.mean([sel.fitness for sel in selected]))
-            """
-            print("CROSSOVER --------")
-            print("before:")
-            print([sel.b_chromossome for sel in selected])
-            crossed = self.crossover_func(selected, **cros_args)
-            print("after:")
-            print([cr.b_chromossome for cr in crossed])
-            
-            print("MUTATION --------")
-            print("before:")
-            print([cros.b_chromossome for cros in crossed])
-            mutated = self.mutation_func(crossed, **mut_args)
-            print("after:")
-            print([mut.b_chromossome for mut in mutated])
-            
-            pop = crossed
-            if self.elite:
-                pop[-1] = best
-            gen = Generation(pop)
-            gen.print()
-            self.generations.append(gen)
+                crossed = self.crossover_func(selected, **cros_args)
+                #for s in range(0,len(selected)):
+                ##    if selected[s].chromossome != crossed[s]:
+                #       raise ValueError("Deu certo") 
+                    
+                 
 
+                cont = 0 
+                for s,c in zip(selected,crossed):
+                    if not np.array_equal(s.chromossome,c.chromossome):
+                        pass
+                        #raise ValueError("BUSTED")
+                        cont += 1
+
+                print("CHANGEEEEEEEEEEEED", cont)
+                #print("after:")
+                #print([cr.chromossome for cr in crossed])
+                
+                #print("MUTATION --------")
+                #print("before:")
+                #print([cros.chromossome for cros in crossed])
+                mutated = self.mutation_func(crossed, **mut_args)
+                #print("after:")
+                #print([mut.chromossome for mut in mutated])
+                
+                pop = mutated
+                pop = self.get_fitness(pop, self.fitness_func)
+                if self.elite:
+                    pop[-1] = best
+                gen = Generation(pop)
+                
+                #gen.print()
+                print("GEN:", len(self.generations))
+                self.generations.append(gen)
+        except KeyboardInterrupt:
+            pass
         
 
 
@@ -152,11 +171,11 @@ class EvolutionaryAlgorithm():
         TODO DOC
         """
         start = time.time()
-        for ind in pop:
-            ind.fitness = round(fitness_func(np.array(ind.chromossome)),5)
+        for i in range(0,len(pop)):
+            pop[i].fitness = round(fitness_func(np.array(pop[i].chromossome)),5)
         end = time.time() - start
         #print ("time:", end)
-        return pop
+        return deepcopy([deepcopy(p) for p in pop])
 
     def info(self):
         """

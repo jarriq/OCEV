@@ -6,6 +6,7 @@ import ocev.utils as utils
 class Individual():
 
     def __init__(self):
+        self.id = None
         self.dim = None
         self.bounds = None
         self.precision = None

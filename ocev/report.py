@@ -23,9 +23,9 @@ class Report():
         print(average_fitness)
 
 
-        plt.plot(generation,best_fitness,"blue")
-        plt.plot(generation,average_fitness,"black")
-        plt.plot(generation,worst_fitness,"red")
+        plt.plot(generation,best_fitness,"blue",lw=0.6)
+        plt.plot(generation,average_fitness,"black",lw=0.6)
+        #plt.plot(generation,worst_fitness,"red",lw=0.6)
         plt.grid(axis='both')
         plt.xlabel('Geração')
         plt.ylabel('Fitness')

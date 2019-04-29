@@ -1,7 +1,7 @@
 ga:
 cod='bin'
 gen=100
-pop=30
+pop=10
 elite=True
 ------------------------------
 individual:
@@ -22,4 +22,4 @@ method='2-point'
 ------------------------------
 mutation:
 mutation=binary_mutation
-perc=0.1
+perc=0.05

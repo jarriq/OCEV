@@ -34,9 +34,10 @@ def stochastic_universal_sampling(list_pop):
     sum_fitness = np.sum(list_raw_fitness)
     list_rel_fitness = [rf/sum_fitness for rf in list_raw_fitness]
 
+    '''
     for i,f in enumerate(list_rel_fitness):
         print (i, str(round(f*100,3)) + '%')
-
+    '''
     selected_pop = []
     for _ in range(int(len(list_pop)/2)):
         rand1 = random.random()
@@ -81,7 +82,7 @@ def uniform_rank(list_pop):
 
     return selected_pop
 
-def stochastic_tourney(list_pop, k=2, kp=1, method='worst'):
+def stochastic_tourney(list_pop, k=2, kp=1, method='random'):
     """
     param int k [0,N] = numero de individus do torneio 
     param float [0,1] kp = probabilidade de escolher o primero
