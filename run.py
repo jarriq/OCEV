@@ -3,7 +3,7 @@ Parses input files and executes the GA
 """
 
 import os
-import ocev.evolutionary as GA
+import ocev.evolutionary as evo
 
 def select_input_files():
     folder = os.path.dirname(os.path.abspath(__file__))+"/inputs/"
@@ -27,13 +27,13 @@ def select_input_files():
 def read_input(input_path):
     ga_args = {"cod":None,
                 "gen":None,
-                "pop":None,
+                "pop_size":None,
+                "fitness":None,
                 "elite":False}
     
     individual_args = {"dim":None,
-                        "bounds":None,
-                        "fitness":None,
-                        "precision":0}
+                        "lower_bound":None,
+                        "upper_bound":None}
 
     selection_args = {"selection":None}
 
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     print(sel)
     print(cros)
     print(mut)
-    GA.EvolutionaryAlgorithm(ga,ind,sel,cros,mut)
+    evo.Population(ga,ind,sel,cros,mut)

@@ -150,3 +150,24 @@ def local_selection(list_pop, r=2, method='best'):
         else:
             raise ValueError("Método inválido")
     return selected
+
+def roulette(individuals):
+    pop_size = len(individuals)
+    list_fitness = [ind.fitness for ind in individuals]
+    sum_fitness = np.sum(list_fitness)
+    list_fitness = list_fitness / sum_fitness
+    indexes = np.random.choice(pop_size, pop_size, p=list_fitness)
+    parents = [individuals[i] for i in indexes]
+    
+    return parents
+
+
+def tournment(individuals, tournment_size=2):
+    pop_size = len(individuals)
+    winners = []
+    for i in range(pop_size):
+        gladiators = random.sample(individuals, tournment_size)
+        sorted_gladiators = sorted(gladiators, key=lambda ind: ind.fitness)
+        winners.append(sorted_gladiators[tournment_size - 1])
+    
+    return winners

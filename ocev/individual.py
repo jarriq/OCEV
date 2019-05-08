@@ -3,92 +3,38 @@ import random
 import numpy as np
 import ocev.utils as utils
 
+
 class Individual():
 
-    def __init__(self):
-        self.id = None
-        self.dim = None
-        self.bounds = None
-        self.precision = None
-        self.chromossome = None
+    def __init__(self, chromossome):
+        self.chromossome = chromossome
+        self.fitness = 0
 
-        self.fitness = None
-
-    def info(self):
-        print(type(self))
-        print("--------------------------")
-        print("-Dimension: ",self.dim)
-        print("-Chromossome: ",self.chromossome)
-        print("-Fitness: ",self.fitness)
-        print("-Precision: ",self.precision) 
-        return
-
-    def bounds_ok(self):
-        pass
-
-        
-class Binary(Individual):
-
-    def __init__(self, ind_args): 
-        super().__init__()
-        self.bounds = ind_args['bounds']
-        self.nvars = len(ind_args['bounds']['high'])
-        self.precision = 10**-(ind_args["precision"])
-        
-        self.L = utils.find_L(self.nvars, self.bounds, self.precision)
-        self.dim = sum(self.L)
-
-        self.b_chromossome = self.generate_chromossome(self.dim)
-        #print(self.b_chromossome)
-        self.chromossome = np.array(utils.scale_adjust(self.b_chromossome, self.bounds, self.L, self.precision))
-        #print(self.chromossome)
-
-    def generate_chromossome(self, dim):
-        return ("".join(str(random.choice("01")) for i in range(int(dim))))
-
-    def bounds_ok(self):
-        for i, c in enumerate(self.chromossome):
-            if not (self.bounds['low'][i] <= c <= self.bounds['high'][i]):
-                return False
-        return True
-
-    def reajust(self):
-        self.chromossome = np.array(utils.scale_adjust(self.b_chromossome, self.bounds, self.L, self.precision))
-
-class Integer(Individual):
-
-    def __init__(self,ind_args):
-        super().__init__()
-        self.dim = ind_args['dim']
-        self.bounds = ind_args['bounds']
-        self.chromossome = self.generate_chromossome(self.dim,self.bounds)
-
-    def generate_chromossome(self,dim,bounds):
-        return (np.random.randint(bounds['low'],bounds['high'],dim))
-
-class PermutedInteger(Individual):
-
-    def __init__(self,ind_args):
-        super().__init__()
-        self.dim = ind_args['dim']
-        self.bounds = ind_args['bounds']
-        self.chromossome = self.generate_chromossome(self.bounds)
+def binary(pop_size, dim, lower_bound=0, upper_bound=0):
+    chromos = []
+    for ind in range(pop_size):
+        chromos.append("".join(str(random.choice("01")) for i in range(int(dim))))
+    return [Individual(chromo) for chromo in chromos]
 
 
-    def generate_chromossome(self,bounds):
-        chromossome = np.arange(bounds['low'][0],bounds['high'][0])
-        np.random.shuffle(chromossome)
-        return (chromossome)
-
-class Real(Individual):
-
-    def __init__(self,ind_args):
-        super().__init__()
-        self.dim = ind_args['dim']
-        self.bounds = ind_args['bounds']
-        self.chromossome = self.generate_chromossome(self.dim, self.bounds)
-
-    def generate_chromossome(self,dim,bounds):
-        return (np.random.uniform(bounds['low'],bounds['high'],dim))
+def integer(pop_size, dim, lower_bound=0, upper_bound=10):
+    chromos = []
+    for ind in range(pop_size):
+        chromos.append(np.random.randint(lower_bound, upper_bound, size=dim))
+    return [Individual(chromo) for chromo in chromos]
 
 
+def int_perm(pop_size, dim, lower_bound=0, upper_bound=10):
+    chromos = []
+    for ind in range(pop_size):
+        chromos.append(np.random.permutation(dim))
+    return [Individual(chromo) for chromo in chromos]
+
+
+def real(pop_size, dim, lower_bound=0, upper_bound=10):
+    chromos = []
+    for ind in range(pop_size):
+        chromos.append(
+            np.random.uniform(lower_bound, upper_bound, size=dim)
+        )
+    return [Individual(chromo) for chromo in chromos]

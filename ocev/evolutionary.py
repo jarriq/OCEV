@@ -3,11 +3,12 @@ import time
 import random
 import os
 import numpy as np
-import ocev.creators as cr
 import ocev.fitness as fit
 import ocev.selection as sel
 import ocev.operators as op
 import ocev.report as rep
+from ocev.individual import Individual, binary, integer, int_perm, real
+
 from operator import attrgetter
 import numpy as np
 from copy import copy, deepcopy
@@ -15,37 +16,21 @@ from copy import copy, deepcopy
 class Generation():
 
     def __init__(self, pop):
-        self.population = pop
 
+        self.pop = pop
         self.best = None
         self.worst = None
-        self.mean = None
-        self.n_rest_broken = None
-        self.get_n_rest_broken()
-        self.set_values()   
+        self.average = None
+        self.set_values(pop)
 
-    def get_n_rest_broken(self):
-        cont = 0
-        for ind in self.population:
-            if not ind.bounds_ok():
-                cont += 1
-        self.n_rest_broken = cont
-
-    def set_values(self):
+    def set_values(self, pop):
         #print([ind.fitness for ind in self.population])
-        self.best = max(self.population, key=attrgetter('fitness'))
-        self.worst = min(self.population, key=attrgetter('fitness'))
-        self.average = np.average([ind.fitness for ind in self.population])
+        self.best = max(pop, key=attrgetter('fitness'))
+        self.worst = min(pop, key=attrgetter('fitness'))
+        self.average = np.average([ind.fitness for ind in pop])
 
-    def print(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-        #print("pop: ",self.population)
-        print("best_fit: ",self.best.fitness)
-        print("worst_fit: ",self.worst.fitness)
-        print("average_fit: ",self.average)
-        print("broken: ",self.n_rest_broken)
 
-class EvolutionaryAlgorithm():
+class Population():
 
     def __init__(self, ga_args, ind_args, sel_args, cros_args, mut_args):
         """
@@ -55,98 +40,39 @@ class EvolutionaryAlgorithm():
         bounds param: tuple, (lim_inferior,lim_superior)
         seed param: int, seed para geração de números aleatórios
         """ 
-            
+        self.ind_args = ind_args
+        self.sel_args = sel_args
+        self.cros_args = cros_args
+        self.mut_args = mut_args
+
+
+
         print ("Gerando população inicial...")
         self.cod = ga_args["cod"]
-        self.pop_size = ga_args["pop"]
+        self.pop_size = ind_args["pop_size"]
         self.n_gen = ga_args["gen"]
         self.elite = ga_args["elite"]
-        self.dim = ind_args['dim']
-        self.fitness_func = eval("fit." + ind_args["fitness"])
+        #self.n_exec = ga_args["n_exec"]
+
+        self.fitness_func = eval("fit." + ga_args["fitness"])
         self.selection_func = eval("sel." + sel_args["selection"])
         sel_args.pop("selection")
         
-        self.operator = cr.OperatorCreator.get_operator(self.cod)
-        self.crossover_func = eval("self.operator." + cros_args["crossover"])
+
+        self.crossover_func = eval("op." + cros_args["crossover"])
         cros_args.pop("crossover")
         print(cros_args)
 
-        self.mutation_func = eval("self.operator." + mut_args["mutation"])
+        self.mutation_func = eval("op." + mut_args["mutation"])
         mut_args.pop("mutation")
         print(mut_args)
 
         self.generations = []
-        self.population = self.gerenerate_population(ind_args)
-        
+        self.individuals = eval(self.cod)(**ind_args)
 
-        self.get_fitness(self.population, self.fitness_func)
-        gen = Generation(self.population)
-        pop = gen.population[:]
-        self.generations.append(gen)
+        self.best_individual = None
         try:
-            while len(self.generations) < self.n_gen:
-
-                pop = deepcopy([deepcopy(p) for p in pop])
-
-                pop2 = self.get_fitness(pop, self.fitness_func)
-                if self.elite:
-                    best = deepcopy(max(pop, key=attrgetter('fitness')))
-                    print("BEST:",best.fitness)
-                    
-
-                
-                print("SELECTION ----------------------------------------")
-                print("before:")
-                print([p.chromossome for p in pop])
-                print([p.fitness for p in pop])
-                print(np.mean([p.fitness for p in pop]))
-                
-                selected = self.selection_func(pop2,**sel_args)
-
-                
-                print("after:")
-                print([sel.chromossome for sel in selected])
-                print([sel.fitness for sel in selected])
-                print(np.mean([sel.fitness for sel in selected]))
-                
-                #print("CROSSOVER --------")
-                #print("before:")
-                #print([sel.chromossome for sel in selected])
-
-                crossed = self.crossover_func(selected, **cros_args)
-                #for s in range(0,len(selected)):
-                ##    if selected[s].chromossome != crossed[s]:
-                #       raise ValueError("Deu certo") 
-                    
-                 
-
-                cont = 0 
-                for s,c in zip(selected,crossed):
-                    if not np.array_equal(s.chromossome,c.chromossome):
-                        pass
-                        #raise ValueError("BUSTED")
-                        cont += 1
-
-                print("CHANGEEEEEEEEEEEED", cont)
-                #print("after:")
-                #print([cr.chromossome for cr in crossed])
-                
-                #print("MUTATION --------")
-                #print("before:")
-                #print([cros.chromossome for cros in crossed])
-                mutated = self.mutation_func(crossed, **mut_args)
-                #print("after:")
-                #print([mut.chromossome for mut in mutated])
-                
-                pop = mutated
-                pop = self.get_fitness(pop, self.fitness_func)
-                if self.elite:
-                    pop[-1] = best
-                gen = Generation(pop)
-                
-                #gen.print()
-                print("GEN:", len(self.generations))
-                self.generations.append(gen)
+            self.evolve()
         except KeyboardInterrupt:
             pass
         
@@ -155,50 +81,63 @@ class EvolutionaryAlgorithm():
         report = rep.Report(self.generations)
         report.plot_convergence()
 
-    def gerenerate_population(self, ind_args):
-        """
-        Gera a população com base nos parametros de inicialização
-        """
-        population = []
-        for _ in range(self.pop_size):
-            population.append(cr.IndvidualCreator.create(self.cod, ind_args))
-        
-        return population
+    def evolve(self):
+        generation = 0
+        self.get_fitness(self.individuals)
+        self.generations.append(Generation(self.individuals))
+        while generation < self.n_gen:
+            #self.get_diversity()
+            parents = self.selection_func(self.individuals)
+            next_generation = self.crossover(parents)
+            self.mutation(next_generation)
+            self.generations.append(Generation(self.individuals))
+            self.individuals = next_generation
+            
+            generation += 1
+        #self.show_best(self.best_individual)
 
+    def get_diversity(self):
+        chromos = np.array([ind.chromossome for ind in self.individuals])
+        ci = np.sum(chromos, axis=0) / self.pop_size
+        div = np.sum((chromos - ci) ** 2)
+        #self.diversity.append(div)
 
-    def get_fitness(self, pop, fitness_func):
-        """
-        TODO DOC
-        """
-        start = time.time()
-        for i in range(0,len(pop)):
-            pop[i].fitness = round(fitness_func(np.array(pop[i].chromossome)),5)
-        end = time.time() - start
-        #print ("time:", end)
-        return deepcopy([deepcopy(p) for p in pop])
+    def get_fitness(self, individuals):
+        max_fitness = 0.0
+        for ind in individuals:
+            ind.fitness = round(self.fitness_func(ind.chromossome),5)
+            if ind.fitness > max_fitness:
+                max_fitness = ind.fitness
+                if self.best_individual is None:
+                    self.best_individual = deepcopy(ind)
+                if ind.fitness > self.best_individual.fitness:
+                    self.best_individual = deepcopy(ind)
 
-    def info(self):
-        """
-        TODO DOC
-        """
-        print ("[Info]")
-        print (" - COD: "+str(self.cod))
-        print (" - D: "+str(self.dim))
-        print (" - pop_size: "+str(self.pop_size))
-        #print (" - bounds: ["+str(self.low_bound)+","+str(self.high_bound)+"]")
+    def crossover(self, parents):
+        next_generation = []
+        for ind in range(0, self.pop_size, 2):
+            ctax = np.random.uniform(0, 1)
+            if ctax < self.cros_args["ratio"]:
+                childs = self.crossover_func(
+                    parents[ind].chromossome, parents[ind+1].chromossome,
+                    **self.cros_args
+                )
+                next_generation.append(Individual(childs[0]))
+                next_generation.append(Individual(childs[1]))
+            else:
+                next_generation.append(Individual(parents[ind].chromossome))
+                next_generation.append(
+                    Individual(parents[ind+1].chromossome)
+                )
+        self.get_fitness(next_generation)
+        next_generation = sorted(next_generation, key=lambda ind: ind.fitness)
+        print (next_generation[0].chromossome, next_generation[0].fitness)
+        next_generation[0] = deepcopy(self.best_individual)
+        return next_generation
 
-    def print_pop(self,pop):
-        """
-        TODO DOC
-        """
-        print ("[population = "+str(self.pop_size)+"]")
-        for i in range(0,len(pop)):
-            print (" " + str(i + 1) + " ->",pop[i].chromossome,
-                   "-> fit: ", round(pop[i].fitness,5))
-        return
-
-
-
-
-
+    def mutation(self, individuals):
+        for ind in individuals:
+            self.mutation_func(
+                ind.chromossome, **self.mut_args
+                )
 
